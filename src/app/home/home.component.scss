@@ -1,0 +1,48 @@
+$my-font-size: 14px;
+$my-pink: rgb(211, 83, 250);
+$my-blue: #69a0d6;
+
+%title {
+  font-size: $my-font-size;
+  color: $my-pink;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+  grid-template-rows: auto;
+  grid-row-gap: 5px;
+  justify-items: start;
+  justify-content: stretch;
+  align-items: center;
+}
+
+.showmap {
+  grid-column-start: 1;
+  grid-column-end: 10;
+  border: 1px solid $my-blue;
+  width: 100%;
+  height: 400px;
+  display: flex;
+}
+
+.name {
+  @extend %title;
+  font-size: $my-font-size;
+  display: inline-block;
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row: auto;
+  width: 30%;
+  span {
+    color: rgb(75, 75, 75);
+    font-weight: bold;
+  }
+}
+.map {
+  grid-column-start: 3;
+  grid-column-end: 10;
+  grid-row: auto;
+  width: 70%;
+  height: 100%;
+}
