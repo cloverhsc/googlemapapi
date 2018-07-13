@@ -69,14 +69,86 @@ export class HomeComponent implements OnInit {
 
     // info window with multiple marker.
     this.mulInfoW();
+
+    // directions api.
+    this.directionsAPI();
   }
 
+  /**
+   * 要在Google console platform 啟用Directions API
+   */
+  directionsAPI() {
+    const waypAry = [
+      { lat: 24.978641, lng: 121.550183},
+      { lat: 24.978835, lng: 121.551471},
+      { lat: 24.980031, lng: 121.554078},
+      { lat: 24.985215, lng: 121.554014},
+      { lat: 24.989114, lng: 121.552426},
+      { lat: 24.998537, lng: 121.553359},
+      { lat: 24.999792, lng: 121.554089},
+      { lat: 25.006005, lng: 121.558037},
+      { lat: 25.013755, lng: 121.553700},
+      { lat: 25.017200, lng: 121.550756},
+      { lat: 25.018145, lng: 121.551001},
+      { lat: 25.019426, lng: 121.551639},
+      { lat: 25.022253, lng: 121.554548},
+      { lat: 25.022036, lng: 121.555858},
+      { lat: 25.021395, lng: 121.556491},
+      { lat: 25.020733, lng: 121.556581},
+      { lat: 25.019660, lng: 121.557472},
+      { lat: 25.018747, lng: 121.558393},
+      { lat: 25.015796, lng: 121.560833},
+      { lat: 25.011942, lng: 121.563439},
+      { lat: 25.007152, lng: 121.566270},
+      // { lat: 25.003094, lng: 121.571877},
+      // { lat: 24.999174, lng: 121.574110},
+      // { lat: 24.997324, lng: 121.573606},
+      // { lat: 24.992473, lng: 121.571290},
+      // { lat: 24.991790, lng: 121.571143},
+      // { lat: 24.990096, lng: 121.576859},
+      // { lat: 24.989235, lng: 121.579685}
+    ];
+    const map9 = new google.maps.Map(
+      this.el.nativeElement.querySelector('#map9'),
+      {center: this.position, zoom: 15 }
+    );
+    let dr = new google.maps.DirectionsService;
+    let display = new google.maps.DirectionsRenderer;
+    display.setMap(map9);
+    let waypts = [];
+    waypAry.forEach((loc) => {
+      waypts.push({
+        location: loc,
+        stopover: false
+      });
+    });
+
+    dr.route(
+      {
+        origin: { lat: 24.979577, lng: 121.548874 },
+        destination: { lat: 24.987055, lng: 121.587794 },
+        travelMode: google.maps.TravelMode.DRIVING,
+        waypoints: waypts,
+      },
+      (resp, status) => {
+        if ( status.toString() === 'OK') {
+          display.setDirections(resp);
+        } else {
+          window.alert(`Directions request failed due to ${status.toString()}`);
+        }
+      }
+    );
+  }
+
+  /**
+   * multiple info window on marker.
+   */
   mulInfoW() {
-    /* const markersAry = [
+    const markersAry = [
       { lat: 24.980102, lng: 121.549126, img: 'ball.png'},
       { lat: 24.981312, lng: 121.546236, img: 'castle.png'},
       { lat: 24.980622, lng: 121.549246, img: 'ginza.jpg'},
-      { lat: 24.982832, lng: 121.543656, img: 'gomba.png'},
+      { lat: 24.982832, lng: 121.543656, img: 'goomba.png'},
       { lat: 24.980942, lng: 121.549966, img: 'mario.png'},
       { lat: 24.983052, lng: 121.547076, img: 'robot.png'}
     ];
@@ -99,32 +171,22 @@ export class HomeComponent implements OnInit {
       contentString = `<div><img src="assets/${loc.img}"
         width='160' height='120'></img></div>`;
 
-      infow = new google.maps.InfoWindow({
-        content: contentString
-      });
-      multMarks.addListener('click', () => infow.open(map8, multMarks));
-  }); */
+      infow = new google.maps.InfoWindow();
+      google.maps.event.addListener(
+        multMarks, 'click', ((
+          mark: google.maps.Marker,
+          content: string,
+          infowindow: google.maps.InfoWindow) => {
+            return () => {
+            infowindow.setContent(content);
+            infowindow.open(map8, mark);
+          };
+        })(multMarks, contentString, infow)
+      );
+    });
+  }
 
-  const locations = [
-    ['loan 1', 33.890542, 151.274856, 'address 1'],
-    ['loan 2', 33.923036, 151.259052, 'address 2'],
-    ['loan 3', 34.028249, 151.157507, 'address 3'],
-    ['loan 4', 33.80010128657071, 151.28747820854187, 'address 4'],
-    ['loan 5', 33.950198, 151.259302, 'address 5']
-  ];
-  const myOptions = {
-    center: new google.maps.LatLng(33.890542, 151.274856),
-    zoom: 8
-  };
-  let map = new google.maps.Map(
-    this.el.nativeElement.querySelector('#map8'),
-    myOptions
-  );
-
-  this.setMarkers(map, locations);
-}
-
-setMarkers(map, locations: Array<any>) {
+/* setMarkers(map, locations: Array<any>) {
 
   let marker, i;
   for (i = 0; i < locations.length; i++) {
@@ -139,17 +201,17 @@ setMarkers(map, locations: Array<any>) {
     });
     map.setCenter(marker.getPosition());
 
-    let content = 'Loan Number: ' + loan + '</h3>' + 'Address: ' + add;
+    let content = 'Loan Number: <h3>' + loan + '</h3>' + ' Address: ' + add;
     let infowindow = new google.maps.InfoWindow();
     google.maps.event.addListener(
-      marker, 'click', (function(marker, content, infowindow) {
-        return function() {
+      marker, 'click', ((marker, content, infowindow) => {
+        return () => {
           infowindow.setContent(content);
           infowindow.open(map, marker);
         };
       })(marker, content, infowindow));
   }
-}
+} */
 
   /**
    * Single info window
@@ -328,5 +390,22 @@ setMarkers(map, locations: Array<any>) {
         map: map2
       });
     });
+  }
+}
+
+
+class DirectionObj {
+  origin: string | google.maps.LatLng | google.maps.Place;
+  destination: string | google.maps.LatLng | google.maps.Place;
+  travelMode = 'DRIVING';
+  waypoints?: [WayPoint];
+}
+
+class WayPoint {
+  location: string | google.maps.LatLng | google.maps.Place;
+  stopover: boolean;
+  constructor (locate?, isstopover = false) {
+    this.location = locate;
+    this.stopover = isstopover;
   }
 }
